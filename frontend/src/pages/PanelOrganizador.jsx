@@ -32,7 +32,7 @@ const PanelOrganizador = () => {
   const [mensaje, setMensaje] = useState("");
 
   // Solo acceso para organizadores
-  if (usuario?.rol !== "organizador") {
+  if (usuario?.perfil !== "organizador") {
     return <Alert severity="error">Acceso restringido a organizadores</Alert>;
   }
 

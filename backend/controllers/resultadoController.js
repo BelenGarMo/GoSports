@@ -12,7 +12,20 @@ const resultadoController = {
     });
   },
 
-  // Obtener un resultado por ID
+   // Obtener los resultados de un evento específico
+  obtenerResultadosPorEvento: (req, res) => {
+    const idEvento = req.params.idEvento;
+    Resultado.getByEvento(idEvento, (err, resultados) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ mensaje: 'Error al obtener resultados', error: err });
+      }
+      res.status(200).json(resultados);
+    });
+  },
+  
+   // Obtener un resultado por ID
   obtenerResultadoPorId: (req, res) => {
     const id = req.params.id;
     Resultado.getById(id, (err, resultado) => {

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import './App.css';
 import Header from "./components/Header";
 import Inicio from "./pages/Inicio";
 import LoginPage from "./pages/LoginPage";
@@ -8,6 +9,7 @@ import Resultados from "./pages/Resultados";
 import Inscripciones from "./pages/Inscripciones";
 import PanelCronometrista from "./pages/PanelCronometrista";
 import PanelOrganizador from "./pages/PanelOrganizador";
+import RecuperarContrasena from "./pages/RecuperarContrasena";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/recuperarcontrasena" element={<RecuperarContrasena />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/calendario" element={<Calendario />} />
           <Route path="/resultados" element={<Resultados />} />

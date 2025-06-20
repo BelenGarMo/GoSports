@@ -5,6 +5,9 @@ const resultadoController = require('../controllers/resultadoController');
 // Ruta para obtener todos los resultados
 router.get('/', resultadoController.obtenerResultados);
 
+// Ruta para obtener resultados por id de evento
+router.get('/evento/:idEvento', resultadoController.obtenerResultadosPorEvento);
+
 // Ruta para obtener un resultado por ID
 router.get('/:id', resultadoController.obtenerResultadoPorId);
 

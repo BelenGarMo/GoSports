@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Inscripciones = () => {
   const { usuario, token } = useContext(AuthContext);
@@ -30,6 +31,7 @@ const Inscripciones = () => {
     metodoPago: ""
   });
   const [mensaje, setMensaje] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Traer todos los eventos
@@ -38,18 +40,26 @@ const Inscripciones = () => {
       .then(res => setEventos(res.data))
       .catch(console.error);
 
-    // Traer mis inscripciones
-    axios
-      .get("http://localhost:3001/api/inscripciones", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res =>
-        setInscripciones(res.data.filter(i => i.idUsuario === usuario.idUsuario))
-      )
-      .catch(console.error);
-  }, [token, usuario.idUsuario]);
+    // Traer mis inscripciones solo si hay usuario y token
+    if (usuario && token) {
+      axios
+        .get("http://localhost:3001/api/inscripciones", {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res =>
+          setInscripciones(
+            res.data.filter(i => i.idUsuario === usuario.id)
+          )
+        )
+        .catch(console.error);
+    }
+  }, [token, usuario.id]);
 
   const handleOpen = evento => {
+    if (!usuario || !token) {
+      navigate("/login");
+      return;
+    }
     setForm({ idEvento: evento.idEvento, categoria: "", metodoPago: "" });
     setOpen(true);
     setMensaje("");
@@ -61,11 +71,15 @@ const Inscripciones = () => {
   };
 
   const handleSubmit = () => {
+    if (!usuario || !token) {
+      navigate("/login");
+      return;
+    }
     axios
       .post(
         "http://localhost:3001/api/inscripciones",
         {
-          idUsuario: usuario.idUsuario,
+          idUsuario: usuario.id,
           idEvento: form.idEvento,
           categoria: form.categoria,
           metodoPago: form.metodoPago
@@ -74,8 +88,17 @@ const Inscripciones = () => {
       )
       .then(res => {
         setMensaje("Inscripción creada con éxito");
-        setInscripciones(prev => [...prev, res.data]);
         setOpen(false);
+
+        // Refrescar inscripciones desde el backend
+        axios
+          .get("http://localhost:3001/api/inscripciones", {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+          .then(res =>
+            setInscripciones(res.data.filter(i => i.idUsuario === usuario.idUsuario))
+          )
+          .catch(console.error);
       })
       .catch(err => {
         console.error(err);
@@ -161,27 +184,31 @@ const Inscripciones = () => {
         </DialogActions>
       </Dialog>
 
-      <Typography variant="h5" sx={{ mt: 4 }}>
-        Mis Inscripciones
-      </Typography>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Evento</TableCell>
-            <TableCell>Estado de Pago</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {inscripciones.map(ins => (
-            <TableRow key={ins.idInscripcion}>
-              <TableCell>
-                {eventos.find(e => e.idEvento === ins.idEvento)?.nombre}
-              </TableCell>
-              <TableCell>{ins.estadoPago}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {usuario && token && (
+        <>
+          <Typography variant="h5" sx={{ mt: 4 }}>
+            Mis Inscripciones
+          </Typography>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Evento</TableCell>
+                <TableCell>Estado de Pago</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {inscripciones.map(ins => (
+                <TableRow key={ins.idInscripcion}>
+                  <TableCell>
+                    {eventos.find(e => e.idEvento === ins.idEvento)?.nombre}
+                  </TableCell>
+                  <TableCell>{ins.estadoPago}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </>
+      )}
     </Container>
   );
 };

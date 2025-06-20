@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { TextField, Button, Typography, Container, Box, Alert } from '@mui/material';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -58,6 +58,19 @@ const Login = () => {
             Iniciar Sesión
           </Button>
         </form>
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button component={Link} to="/recuperarcontrasena" size="small">
+            ¿Olvidaste tu contraseña?
+          </Button>
+        </Box>
+        <Box sx={{ mt: 1, textAlign: 'center' }}>
+          <Typography variant="body2">
+            ¿No tenés cuenta?{' '}
+            <Button component={Link} to="/registro" size="small">
+              Registrate
+            </Button>
+          </Typography>
+        </Box>
       </Box>
     </Container>
   );

@@ -17,8 +17,10 @@ import { AuthContext } from "../context/AuthContext";
 const PanelCronometrista = () => {
   const { usuario, token } = useContext(AuthContext);
   const [eventos, setEventos] = useState([]);
+  const [corredores, setCorredores] = useState([]);
   const [form, setForm] = useState({
     idEvento: "",
+    idUsuario: "",
     tiempoOficial: "",
     posicionGeneral: "",
     posicionCategoria: ""
@@ -30,12 +32,23 @@ const PanelCronometrista = () => {
     return <Alert severity="error">Acceso restringido a cronometristas</Alert>;
   }
 
-  // Cargo los eventos para poblar el select
+  // Cargo eventos y corredores
   useEffect(() => {
     axios
-      .get("http://localhost:3001/api/eventos", { headers: { Authorization: `Bearer ${token}` } })
+      .get("http://localhost:3001/api/eventos", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
       .then(res => setEventos(res.data))
       .catch(err => console.error("Error al traer eventos", err));
+
+    axios
+      .get("http://localhost:3001/api/usuarios", {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res =>
+        setCorredores(res.data.filter(u => u.rol === "corredor"))
+      )
+      .catch(err => console.error("Error al traer corredores", err));
   }, [token]);
 
   const handleChange = e => {
@@ -46,10 +59,9 @@ const PanelCronometrista = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      // Construyo payload con las columnas que espera la DB
       const payload = {
         idEvento: form.idEvento,
-        idUsuario: usuario.id,
+        idUsuario: form.idUsuario,
         tiempoOficial: form.tiempoOficial,
         posicionGeneral: form.posicionGeneral,
         posicionCategoria: form.posicionCategoria
@@ -60,7 +72,13 @@ const PanelCronometrista = () => {
       });
 
       setMensaje("Resultado cargado con éxito");
-      setForm({ idEvento: "", tiempoOficial: "", posicionGeneral: "", posicionCategoria: "" });
+      setForm({
+        idEvento: "",
+        idUsuario: "",
+        tiempoOficial: "",
+        posicionGeneral: "",
+        posicionCategoria: ""
+      });
     } catch (error) {
       console.error("Error al guardar resultado", error);
       setMensaje("Error al cargar el resultado");
@@ -91,6 +109,24 @@ const PanelCronometrista = () => {
             {eventos.map(evt => (
               <MenuItem key={evt.idEvento} value={evt.idEvento}>
                 {evt.nombre} — {new Date(evt.fecha).toLocaleDateString()}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel id="label-corredor">Corredor</InputLabel>
+          <Select
+            labelId="label-corredor"
+            name="idUsuario"
+            value={form.idUsuario}
+            label="Corredor"
+            onChange={handleChange}
+            required
+          >
+            {corredores.map(c => (
+              <MenuItem key={c.idUsuario} value={c.idUsuario}>
+                {c.nombre} {c.apellido}
               </MenuItem>
             ))}
           </Select>

@@ -19,7 +19,7 @@ const Registro = () => {
     nombre: "",
     apellido: "",
     email: "",
-    contrasena: "",
+    contraseña: "",
     rol: ""
   });
   const [error, setError] = useState("");
@@ -48,7 +48,7 @@ const Registro = () => {
         nombre: "",
         apellido: "",
         email: "",
-        contrasena: "",
+        contraseña: "",
         rol: ""
       });
       setTimeout(() => navigate("/login"), 1500);
@@ -108,8 +108,8 @@ const Registro = () => {
         <TextField
           label="Contraseña"
           type="password"
-          name="contrasena"
-          value={form.contrasena}
+          name="contraseña"
+          value={form.contraseña}
           onChange={handleChange}
           required
         />

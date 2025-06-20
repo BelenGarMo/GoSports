@@ -58,7 +58,7 @@ const Header = () => {
 
           {usuario && (
             <>
-              {usuario.rol === "organizador" && (
+              {usuario.perfil === "organizador" && (
                 <Button
                   component={Link}
                   to="/organizador"
@@ -67,7 +67,7 @@ const Header = () => {
                   Panel Org.
                 </Button>
               )}
-              {usuario.rol === "cronometrista" && (
+              {usuario.perfil === "cronometrista" && (
                 <Button
                   component={Link}
                   to="/cronometrista"

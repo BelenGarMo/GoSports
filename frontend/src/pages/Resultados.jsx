@@ -8,7 +8,11 @@ import {
   TableCell,
   TableBody,
   IconButton,
-  Alert
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -19,22 +23,35 @@ import { useNavigate } from "react-router-dom";
 const Resultados = () => {
   const { usuario, token } = useContext(AuthContext);
   const [resultados, setResultados] = useState([]);
+  const [eventos, setEventos] = useState([]);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState("");
   const [mensaje, setMensaje] = useState("");
   const navigate = useNavigate();
 
+  // Traer eventos y cargar resultados del primero
   useEffect(() => {
     axios
-      .get("http://localhost:3001/api/resultados")
+      .get("http://localhost:3001/api/eventos")
       .then(res => {
-        setResultados(res.data);
+        setEventos(res.data);
+        if (res.data.length) {
+          setEventoSeleccionado(res.data[0].idEvento);
+        }
       })
-      .catch(err => {
-        console.error("Error al obtener resultados", err);
-      });
+      .catch(err => console.error("Error al obtener eventos", err));
   }, []);
 
+  // Cuando cambia el evento seleccionado cargo sus resultados
+  useEffect(() => {
+    if (!eventoSeleccionado) return;
+    axios
+      .get(`http://localhost:3001/api/resultados/evento/${eventoSeleccionado}`)
+      .then(res => setResultados(res.data))
+      .catch(err => console.error("Error al obtener resultados", err));
+  }, [eventoSeleccionado]);
+
   const handleDelete = (id) => {
-    if (usuario?.rol !== "cronometrista") return;
+    if (usuario?.perfil !== "cronometrista") return;
     if (!window.confirm("¿Eliminar este resultado?")) return;
 
     axios
@@ -51,7 +68,7 @@ const Resultados = () => {
   };
 
   const handleEdit = (id) => {
-    if (usuario?.rol !== "cronometrista") return;
+    if (usuario?.perfil !== "cronometrista") return;
     navigate("/cronometrista");
   };
 
@@ -70,15 +87,30 @@ const Resultados = () => {
         </Alert>
       )}
 
+      <FormControl sx={{ mb: 2, minWidth: 240 }}>
+        <InputLabel id="evento-label">Evento</InputLabel>
+        <Select
+          labelId="evento-label"
+          value={eventoSeleccionado}
+          label="Evento"
+          onChange={e => setEventoSeleccionado(e.target.value)}
+        >
+          {eventos.map(ev => (
+            <MenuItem key={ev.idEvento} value={ev.idEvento}>
+              {ev.nombre}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>ID Evento</TableCell>
-            <TableCell>ID Usuario</TableCell>
+            <TableCell>Corredor</TableCell>
             <TableCell>Tiempo</TableCell>
             <TableCell>Pos. General</TableCell>
             <TableCell>Pos. Cat.</TableCell>
-            {usuario?.rol === "cronometrista" && (
+            {usuario?.perfil === "cronometrista" && (
               <TableCell>Acciones</TableCell>
             )}
           </TableRow>
@@ -86,12 +118,11 @@ const Resultados = () => {
         <TableBody>
           {resultados.map(r => (
             <TableRow key={r.idResultado}>
-              <TableCell>{r.idEvento}</TableCell>
-              <TableCell>{r.idUsuario}</TableCell>
+              <TableCell>{r.nombre} {r.apellido}</TableCell>
               <TableCell>{r.tiempoOficial}</TableCell>
               <TableCell>{r.posicionGeneral}</TableCell>
               <TableCell>{r.posicionCategoria}</TableCell>
-              {usuario?.rol === "cronometrista" && (
+              {usuario?.perfil === "cronometrista" && (
                 <TableCell>
                   <IconButton onClick={() => handleEdit(r.idResultado)}>
                     <EditIcon />
