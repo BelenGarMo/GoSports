@@ -53,7 +53,7 @@ const Inscripciones = () => {
         )
         .catch(console.error);
     }
-  }, [token, usuario.id]);
+  }, [token, usuario?.id]);
 
   const handleOpen = evento => {
     if (!usuario || !token) {
