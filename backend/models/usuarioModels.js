@@ -1,36 +1,35 @@
 const db = require('../config/db');
 
-// Creamos el modelo de Usuario con los métodos necesarios
-const Usuario = {
-  // Obtener todos los usuarios
+const usuarios = {
+  // Obtener todos los usuarioss
   getAll: (callback) => {
-    const query = 'SELECT * FROM usuarios';
-    db.query(query, callback);
+    db.query('SELECT * FROM usuarios', callback);
   },
 
-  // Obtener un usuario por ID
+  // Obtener un usuarios por ID
   getById: (id, callback) => {
-    const query = 'SELECT * FROM usuarios WHERE idUsuario = ?';
-    db.query(query, [id], callback);
+    db.query('SELECT * FROM usuarios WHERE idusuarios = ?', [id], callback);
   },
 
-  // Crear un nuevo usuario
-  create: (nuevoUsuario, callback) => {
-    const query = 'INSERT INTO usuarios SET ?';
-    db.query(query, nuevoUsuario, callback);
+  // Buscar usuarios por email (para login)
+  findByEmail: (email, callback) => {
+    db.query('SELECT * FROM usuarios WHERE email = ?', [email], callback);
   },
 
-  // Actualizar un usuario existente
-  update: (id, datosActualizados, callback) => {
-    const query = 'UPDATE usuarios SET ? WHERE idUsuario = ?';
-    db.query(query, [datosActualizados, id], callback);
+  // Crear nuevo usuarios
+  create: (datos, callback) => {
+    db.query('INSERT INTO usuarios SET ?', datos, callback);
   },
 
-  // Eliminar un usuario
+  // Actualizar usuarios
+  update: (id, datos, callback) => {
+    db.query('UPDATE usuarios SET ? WHERE idusuarios = ?', [datos, id], callback);
+  },
+
+  // Eliminar usuarios
   delete: (id, callback) => {
-    const query = 'DELETE FROM usuarios WHERE idUsuario = ?';
-    db.query(query, [id], callback);
+    db.query('DELETE FROM usuarios WHERE idusuarios = ?', [id], callback);
   }
 };
 
-module.exports = Usuario;
+module.exports = usuarios;

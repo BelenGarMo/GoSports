@@ -1,8 +1,7 @@
 const Usuario = require('../models/usuarioModels');
+const jwt = require('jsonwebtoken');
 
-// Creamos un objeto controlador con todas las funciones necesarias
 const usuarioController = {
-  // Obtener todos los usuarios
   obtenerUsuarios: (req, res) => {
     Usuario.getAll((err, resultados) => {
       if (err) {
@@ -12,7 +11,6 @@ const usuarioController = {
     });
   },
 
-  // Obtener un usuario por ID
   obtenerUsuarioPorId: (req, res) => {
     const id = req.params.id;
     Usuario.getById(id, (err, resultado) => {
@@ -26,7 +24,6 @@ const usuarioController = {
     });
   },
 
-  // Crear un nuevo usuario
   crearUsuario: (req, res) => {
     const nuevoUsuario = req.body;
     Usuario.create(nuevoUsuario, (err, resultado) => {
@@ -37,7 +34,6 @@ const usuarioController = {
     });
   },
 
-  // Actualizar un usuario existente
   actualizarUsuario: (req, res) => {
     const id = req.params.id;
     const datosActualizados = req.body;
@@ -49,7 +45,6 @@ const usuarioController = {
     });
   },
 
-  // Eliminar un usuario
   eliminarUsuario: (req, res) => {
     const id = req.params.id;
     Usuario.delete(id, (err) => {
@@ -57,6 +52,33 @@ const usuarioController = {
         return res.status(500).json({ mensaje: 'Error al eliminar usuario', error: err });
       }
       res.status(200).json({ mensaje: 'Usuario eliminado correctamente' });
+    });
+  },
+
+  login: (req, res) => {
+    const { email, contraseña } = req.body;
+    Usuario.findByEmail(email, (err, resultado) => {
+      if (err) {
+        return res.status(500).json({ mensaje: 'Error al buscar el usuario', error: err });
+      }
+      if (resultado.length === 0 || resultado[0].contraseña !== contraseña) {
+        return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+      }
+
+      const usuario = resultado[0];
+      const token = jwt.sign({ id: usuario.idUsuario, perfil: usuario.rol }, 'secreto', { expiresIn: '4h' });
+
+      res.status(200).json({
+        mensaje: 'Login exitoso',
+        token,
+        usuario: {
+          id: usuario.idUsuario,
+          nombre: usuario.nombre,
+          apellido: usuario.apellido,
+          email: usuario.email,
+          perfil: usuario.rol
+        }
+      });
     });
   }
 };

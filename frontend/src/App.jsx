@@ -1,35 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Inicio from "./pages/Inicio";
+import LoginPage from "./pages/LoginPage";
+import Registro from "./pages/Registro";
+import Calendario from "./pages/Calendario";
+import Resultados from "./pages/Resultados";
+import Inscripciones from "./pages/Inscripciones";
+import PanelCronometrista from "./pages/PanelCronometrista";
+import PanelOrganizador from "./pages/PanelOrganizador";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <AuthProvider>
+      <Router>
+        <Header />
+        <Routes>
+          <Route path="/" element={<Inicio />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/calendario" element={<Calendario />} />
+          <Route path="/resultados" element={<Resultados />} />
+          <Route path="/inscripciones" element={<Inscripciones />} />
+          <Route path="/cronometrista" element={<PanelCronometrista />} />
+          <Route path="/organizador" element={<PanelOrganizador />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
