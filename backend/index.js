@@ -26,6 +26,8 @@ const inscripcionRoutes = require('./routes/inscripcionRoutes');
 const resultadoRoutes = require('./routes/resultadoRoutes');
 const archivoTiemposRoutes = require('./routes/archivoTiemposRoutes');
 const notificacionRoutes = require('./routes/notificacionRoutes');
+const categoriaRoutes = require('./routes/categoriaRoutes');
+
 
 // Definimos los prefijos para cada grupo de rutas
 app.use('/api/usuarios', usuarioRoutes);
@@ -34,6 +36,7 @@ app.use('/api/inscripciones', inscripcionRoutes);
 app.use('/api/resultados', resultadoRoutes);
 app.use('/api/archivotiempos', archivoTiemposRoutes);
 app.use('/api/notificacion', notificacionRoutes);
+app.use('/api/categorias', categoriaRoutes);
 
 // Definimos el puerto donde se va a ejecutar el servidor
 const PORT = process.env.PORT || 3001;

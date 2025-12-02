@@ -2,19 +2,22 @@ const express = require('express');
 const router = express.Router();
 const inscripcionController = require('../controllers/inscripcionController');
 
-// Ruta para obtener todas las inscripciones
-router.get('/', inscripcionController.obtenerInscripciones);
-
-// Ruta para obtener una inscripción por ID
-router.get('/:id', inscripcionController.obtenerInscripcionPorId);
-
-// Ruta para crear una nueva inscripción
+// Crear nueva inscripción
 router.post('/', inscripcionController.crearInscripcion);
 
-// Ruta para actualizar una inscripción existente
+// Obtener inscriptos de un evento (con datos de categoría)
+router.get('/evento/:idEvento', inscripcionController.obtenerInscritosPorEvento);
+
+// Obtener inscripciones de un usuario
+router.get('/usuario/:idUsuario', inscripcionController.obtenerInscripcionesPorUsuario);
+
+// Verificar si un usuario está inscrito en un evento
+router.get('/verificar/:idEvento/:idUsuario', inscripcionController.verificarInscripcion);
+
+// Actualizar inscripción
 router.put('/:id', inscripcionController.actualizarInscripcion);
 
-// Ruta para eliminar una inscripción
+// Eliminar inscripción
 router.delete('/:id', inscripcionController.eliminarInscripcion);
 
 module.exports = router;

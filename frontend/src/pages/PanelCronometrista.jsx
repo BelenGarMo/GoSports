@@ -1,166 +1,334 @@
-import { useState, useContext, useEffect } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   Container,
   Typography,
-  Select,
-  MenuItem,
   TextField,
   Button,
   Box,
   Alert,
+  FormControl,
   InputLabel,
-  FormControl
+  Select,
+  MenuItem,
+  Paper,
+  Autocomplete,
+  Chip,
+  Grid,
+  Card,
+  CardContent
 } from "@mui/material";
-import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PersonIcon from "@mui/icons-material/Person";
+import CategoryIcon from "@mui/icons-material/Category";
 
 const PanelCronometrista = () => {
   const { usuario, token } = useContext(AuthContext);
   const [eventos, setEventos] = useState([]);
-  const [corredores, setCorredores] = useState([]);
-  const [form, setForm] = useState({
-    idEvento: "",
-    idUsuario: "",
-    tiempoOficial: "",
-    posicionGeneral: "",
-    posicionCategoria: ""
-  });
+  const [inscritos, setInscritos] = useState([]);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState("");
+  const [corredorSeleccionado, setCorredorSeleccionado] = useState(null);
+  const [tiempoOficial, setTiempoOficial] = useState("");
+  const [posicionGeneral, setPosicionGeneral] = useState("");
+  const [posicionCategoria, setPosicionCategoria] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [exito, setExito] = useState(false);
 
-  // Sólo cronometristas
+  // Categoría se obtiene automáticamente del corredor
+  const categoriaDelCorredor = corredorSeleccionado?.idCategoria;
+  const nombreCategoria = corredorSeleccionado?.nombreCategoria;
+
+  // Solo acceso para cronometristas
   if (usuario?.perfil !== "cronometrista") {
-    return <Alert severity="error">Acceso restringido a cronometristas</Alert>;
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Alert severity="error">
+          Acceso restringido a cronometristas
+        </Alert>
+      </Container>
+    );
   }
 
-  // Cargo eventos y corredores
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/api/eventos", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res => setEventos(res.data))
-      .catch(err => console.error("Error al traer eventos", err));
-
-    axios
-      .get("http://localhost:3001/api/usuarios", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(res =>
-        setCorredores(res.data.filter(u => u.rol === "corredor"))
-      )
-      .catch(err => console.error("Error al traer corredores", err));
+    fetchEventos();
   }, [token]);
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
-  };
+  useEffect(() => {
+    if (eventoSeleccionado) {
+      fetchInscritos(eventoSeleccionado);
+    } else {
+      setInscritos([]);
+    }
+  }, [eventoSeleccionado]);
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  const fetchEventos = async () => {
     try {
-      const payload = {
-        idEvento: form.idEvento,
-        idUsuario: form.idUsuario,
-        tiempoOficial: form.tiempoOficial,
-        posicionGeneral: form.posicionGeneral,
-        posicionCategoria: form.posicionCategoria
-      };
-
-      await axios.post("http://localhost:3001/api/resultados", payload, {
+      const res = await axios.get("http://localhost:3001/api/eventos", {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      setMensaje("Resultado cargado con éxito");
-      setForm({
-        idEvento: "",
-        idUsuario: "",
-        tiempoOficial: "",
-        posicionGeneral: "",
-        posicionCategoria: ""
-      });
+      setEventos(res.data);
     } catch (error) {
-      console.error("Error al guardar resultado", error);
-      setMensaje("Error al cargar el resultado");
+      console.error("Error al obtener eventos", error);
+    }
+  };
+
+  const fetchInscritos = async (idEvento) => {
+    try {
+      // Endpoint que trae inscritos CON su categoría
+      const res = await axios.get(
+        `http://localhost:3001/api/inscripciones/evento/${idEvento}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setInscritos(res.data);
+    } catch (error) {
+      console.error("Error al obtener inscritos", error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!eventoSeleccionado || !corredorSeleccionado) {
+      setMensaje("Por favor completa todos los campos obligatorios");
+      setExito(false);
+      return;
+    }
+
+    try {
+      await axios.post(
+        "http://localhost:3001/api/resultados",
+        {
+          idEvento: eventoSeleccionado,
+          idUsuario: corredorSeleccionado.idUsuario || corredorSeleccionado.id,
+          idCategoria: categoriaDelCorredor, // Se envía automáticamente
+          tiempoOficial,
+          posicionGeneral: posicionGeneral || null,
+          posicionCategoria: posicionCategoria || null
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setMensaje("Resultado registrado correctamente");
+      setExito(true);
+
+      // Limpiar formulario
+      setCorredorSeleccionado(null);
+      setTiempoOficial("");
+      setPosicionGeneral("");
+      setPosicionCategoria("");
+
+      setTimeout(() => setMensaje(""), 3000);
+    } catch (error) {
+      console.error("Error al registrar resultado", error);
+      setMensaje(error.response?.data?.mensaje || "Error al registrar resultado");
+      setExito(false);
     }
   };
 
   return (
-    <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Container sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
         Panel del Cronometrista
       </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 400 }}
-      >
-        <FormControl fullWidth>
-          <InputLabel id="label-evento">Evento</InputLabel>
-          <Select
-            labelId="label-evento"
-            name="idEvento"
-            value={form.idEvento}
-            label="Evento"
-            onChange={handleChange}
-            required
-          >
-            {eventos.map(evt => (
-              <MenuItem key={evt.idEvento} value={evt.idEvento}>
-                {evt.nombre} — {new Date(evt.fecha).toLocaleDateString()}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      {mensaje && (
+        <Alert
+          severity={exito ? "success" : "error"}
+          sx={{ mb: 3 }}
+          onClose={() => setMensaje("")}
+        >
+          {mensaje}
+        </Alert>
+      )}
 
-        <FormControl fullWidth>
-          <InputLabel id="label-corredor">Corredor</InputLabel>
-          <Select
-            labelId="label-corredor"
-            name="idUsuario"
-            value={form.idUsuario}
-            label="Corredor"
-            onChange={handleChange}
-            required
-          >
-            {corredores.map(c => (
-              <MenuItem key={c.idUsuario} value={c.idUsuario}>
-                {c.nombre} {c.apellido}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      <Grid container spacing={3}>
+        {/* FORMULARIO */}
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} sx={{ p: 4 }}>
+            <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+              Cargar Tiempo de Corredor
+            </Typography>
 
-        <TextField
-          name="tiempoOficial"
-          label="Tiempo oficial"
-          value={form.tiempoOficial}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          name="posicionGeneral"
-          label="Posición general"
-          type="number"
-          value={form.posicionGeneral}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          name="posicionCategoria"
-          label="Posición categoría"
-          type="number"
-          value={form.posicionCategoria}
-          onChange={handleChange}
-          required
-        />
+            <Box component="form" onSubmit={handleSubmit}>
+              <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel>Evento</InputLabel>
+                <Select
+                  value={eventoSeleccionado}
+                  label="Evento"
+                  onChange={(e) => {
+                    setEventoSeleccionado(e.target.value);
+                    setCorredorSeleccionado(null);
+                  }}
+                  required
+                >
+                  <MenuItem value="">
+                    <em>Selecciona un evento</em>
+                  </MenuItem>
+                  {eventos.map((ev) => (
+                    <MenuItem key={ev.idEvento} value={ev.idEvento}>
+                      {ev.nombre} - {new Date(ev.fecha).toLocaleDateString()}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-        <Button type="submit" variant="contained">
-          Cargar Resultado
-        </Button>
-        {mensaje && <Alert severity={mensaje.includes("éxito") ? "success" : "error"}>{mensaje}</Alert>}
-      </Box>
+              {eventoSeleccionado && inscritos.length === 0 && (
+                <Alert severity="warning" sx={{ mb: 3 }}>
+                  No hay corredores inscritos en este evento
+                </Alert>
+              )}
+
+              {eventoSeleccionado && inscritos.length > 0 && (
+                <>
+                  <Autocomplete
+                    value={corredorSeleccionado}
+                    onChange={(event, newValue) => {
+                      setCorredorSeleccionado(newValue);
+                    }}
+                    options={inscritos}
+                    getOptionLabel={(option) =>
+                      `${option.nombre} ${option.apellido} - ${option.nombreCategoria || "Sin categoría"}`
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Corredor"
+                        required
+                        placeholder="Buscar corredor..."
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props}>
+                        <Box>
+                          <Typography variant="body1">
+                            <PersonIcon sx={{ fontSize: 16, mr: 1, verticalAlign: "middle" }} />
+                            {option.nombre} {option.apellido}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            <CategoryIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: "middle" }} />
+                            {option.nombreCategoria || "Sin categoría"}
+                          </Typography>
+                        </Box>
+                      </li>
+                    )}
+                    sx={{ mb: 3 }}
+                    noOptionsText="No se encontraron corredores"
+                  />
+
+                  {corredorSeleccionado && (
+                    <Alert severity="info" sx={{ mb: 3 }}>
+                      <strong>Categoría asignada:</strong> {nombreCategoria || "Sin categoría"}
+                      <br />
+                      <Typography variant="caption">
+                        La categoría se asigna automáticamente según la inscripción del corredor
+                      </Typography>
+                    </Alert>
+                  )}
+
+                  <TextField
+                    label="Tiempo Oficial"
+                    value={tiempoOficial}
+                    onChange={(e) => setTiempoOficial(e.target.value)}
+                    fullWidth
+                    required
+                    placeholder="HH:MM:SS (ej: 01:25:30)"
+                    sx={{ mb: 3 }}
+                    InputProps={{
+                      startAdornment: <AccessTimeIcon sx={{ mr: 1, color: "action.active" }} />
+                    }}
+                  />
+
+                  <Grid container spacing={2} sx={{ mb: 3 }}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Posición General"
+                        type="number"
+                        value={posicionGeneral}
+                        onChange={(e) => setPosicionGeneral(e.target.value)}
+                        fullWidth
+                        placeholder="Ej: 1, 2, 3..."
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        label="Posición en Categoría"
+                        type="number"
+                        value={posicionCategoria}
+                        onChange={(e) => setPosicionCategoria(e.target.value)}
+                        fullWidth
+                        placeholder="Ej: 1, 2, 3..."
+                      />
+                    </Grid>
+                  </Grid>
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                  >
+                    Registrar Tiempo
+                  </Button>
+                </>
+              )}
+            </Box>
+          </Paper>
+        </Grid>
+
+        {/* PANEL DE INFORMACIÓN */}
+        <Grid item xs={12} md={4}>
+          <Card elevation={3} sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                Información
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Registra los tiempos de los corredores. La categoría se asigna automáticamente según su inscripción.
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: "bold", mb: 1 }}>
+                Formato de tiempo:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                • HH:MM:SS (Ej: 01:25:30)
+                <br />
+                • MM:SS (Ej: 45:30)
+              </Typography>
+            </CardContent>
+          </Card>
+
+          {eventoSeleccionado && inscritos.length > 0 && (
+            <Card elevation={3}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+                  Estadísticas del Evento
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Total de inscritos
+                  </Typography>
+                  <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                    {inscritos.length}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Categorías
+                  </Typography>
+                  {[...new Set(inscritos.map(i => i.nombreCategoria))].map((cat, idx) => (
+                    <Chip
+                      key={idx}
+                      label={`${cat}: ${inscritos.filter(i => i.nombreCategoria === cat).length}`}
+                      size="small"
+                      sx={{ mr: 1, mb: 1 }}
+                    />
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+      </Grid>
     </Container>
   );
 };

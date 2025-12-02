@@ -10,6 +10,7 @@ import Inscripciones from "./pages/Inscripciones";
 import PanelCronometrista from "./pages/PanelCronometrista";
 import PanelOrganizador from "./pages/PanelOrganizador";
 import RecuperarContrasena from "./pages/RecuperarContrasena";
+import MisInscripciones from './pages/MisInscripciones';
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/inscripciones" element={<Inscripciones />} />
           <Route path="/cronometrista" element={<PanelCronometrista />} />
           <Route path="/organizador" element={<PanelOrganizador />} />
+          <Route path="/mis-inscripciones" element={<MisInscripciones />} />
         </Routes>
       </Router>
     </AuthProvider>
