@@ -113,7 +113,6 @@ const PanelOrganizador = () => {
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
     try {
-      // ✅ AGREGAR el idCreador del organizador
       const eventoData = {
         ...formEvento,
         idCreador: usuario.id
