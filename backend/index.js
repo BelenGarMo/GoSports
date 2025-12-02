@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const db = require('./config/db');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 // Middleware para permitir solicitudes desde otros origenes (por ejemplo, desde el frontend)
 app.use(cors());

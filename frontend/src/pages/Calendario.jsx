@@ -83,7 +83,7 @@ const Calendario = () => {
           gutterBottom
           sx={{ fontWeight: 700, color: '#333' }}
         >
-          Calendario de Eventos
+          Calendario de eventos
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Selecciona una fecha para ver los eventos programados
@@ -134,7 +134,6 @@ const Calendario = () => {
         />
       </Paper>
 
-      {/* Modal con diseño mejorado */}
       <Modal
         open={open}
         onClose={() => setOpen(false)}

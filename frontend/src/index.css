@@ -3,7 +3,6 @@
   line-height: 1.6;
   font-weight: 400;
   
-  /* Colores según el diseño de GoSports */
   --color-primary: #2196F3;
   --color-secondary: #FF4081;
   --color-success: #4CAF50;
@@ -44,7 +43,6 @@ body {
   flex-direction: column;
 }
 
-/* Scrollbar personalizada */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -62,7 +60,6 @@ body {
   background: #1976D2;
 }
 
-/* Animaciones suaves */
 .fade-in {
   animation: fadeIn 0.5s ease-in;
 }
@@ -88,7 +85,6 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Botones personalizados */
 .btn-gradient {
   background: linear-gradient(45deg, #667eea 30%, #764ba2 90%);
   transition: all 0.3s ease;

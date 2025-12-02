@@ -113,17 +113,23 @@ const PanelOrganizador = () => {
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
     try {
+      // ✅ AGREGAR el idCreador del organizador
+      const eventoData = {
+        ...formEvento,
+        idCreador: usuario.id
+      };
+
       if (editandoEvento) {
         await axios.put(
           `http://localhost:3001/api/eventos/${editandoEvento}`,
-          formEvento,
+          eventoData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMensaje("Evento actualizado con éxito");
       } else {
         const res = await axios.post(
           "http://localhost:3001/api/eventos",
-          formEvento,
+          eventoData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMensaje("Evento creado con éxito");
@@ -480,13 +486,13 @@ const PanelOrganizador = () => {
                   startIcon={<AddIcon />}
                   onClick={() => handleOpenDialogCategoria()}
                 >
-                  Agregar Categoría
+                  Agregar categoría
                 </Button>
               </Box>
 
               {categorias.length === 0 ? (
                 <Alert severity="info" icon={<CategoryIcon />}>
-                  No hay categorías para este evento. Haz clic en "Agregar Categoría" para crear una.
+                  No hay categorías para este evento. Hacé clic en "Agregar categoría" para crear una.
                 </Alert>
               ) : (
                 <Paper elevation={2}>
@@ -566,7 +572,7 @@ const PanelOrganizador = () => {
         </Box>
       )}
 
-      {/* TAB 3: INSCRIPTOS (placeholder) */}
+      {/* TAB 3: INSCRIPTOS */}
       {tabValue === 2 && (
         <Alert severity="info">
           Próximamente: Lista de inscriptos al evento seleccionado

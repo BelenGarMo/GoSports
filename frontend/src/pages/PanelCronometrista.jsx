@@ -75,7 +75,7 @@ const PanelCronometrista = () => {
 
   const fetchInscritos = async (idEvento) => {
     try {
-      // Endpoint que trae inscritos CON su categoría
+      // Endpoint que trae inscriptos con su categoría
       const res = await axios.get(
         `http://localhost:3001/api/inscripciones/evento/${idEvento}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -101,7 +101,7 @@ const PanelCronometrista = () => {
         {
           idEvento: eventoSeleccionado,
           idUsuario: corredorSeleccionado.idUsuario || corredorSeleccionado.id,
-          idCategoria: categoriaDelCorredor, // Se envía automáticamente
+          idCategoria: categoriaDelCorredor,
           tiempoOficial,
           posicionGeneral: posicionGeneral || null,
           posicionCategoria: posicionCategoria || null
@@ -301,11 +301,11 @@ const PanelCronometrista = () => {
             <Card elevation={3}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                  Estadísticas del Evento
+                  Estadísticas del evento
                 </Typography>
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="body2" color="text.secondary">
-                    Total de inscritos
+                    Total de inscriptos
                   </Typography>
                   <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                     {inscritos.length}

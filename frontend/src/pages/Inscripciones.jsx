@@ -166,7 +166,7 @@ const Inscripciones = () => {
       )}
 
       <Grid container spacing={3}>
-        {/* FORMULARIO */}
+        {}
         <Grid item xs={12} md={7}>
           <Paper elevation={3} sx={{ p: 4 }}>
             <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
@@ -251,7 +251,7 @@ const Inscripciones = () => {
                     </Alert>
                   )}
 
-                  {/* Selector de método de pago */}
+                  {}
                   {categoriaSeleccionada && (
                     <FormControl fullWidth sx={{ mb: 3 }}>
                       <InputLabel>Método de Pago</InputLabel>
@@ -276,7 +276,7 @@ const Inscripciones = () => {
 
                   {yaInscrito ? (
                     <Alert severity="success" sx={{ mb: 2 }}>
-                      Ya estás inscrito en este evento
+                      Ya estás inscripto en este evento
                     </Alert>
                   ) : (
                     <Button
@@ -286,7 +286,7 @@ const Inscripciones = () => {
                       fullWidth
                       disabled={!categoriaSeleccionada || categorias.length === 0}
                     >
-                      Confirmar Inscripción
+                      Confirmar inscripción
                     </Button>
                   )}
                 </>
@@ -301,7 +301,7 @@ const Inscripciones = () => {
             <Card elevation={3}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                  Información del Evento
+                  Información del evento
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
 
@@ -345,7 +345,7 @@ const Inscripciones = () => {
                 {categorias.length > 0 && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                      Categorías Disponibles ({categorias.length})
+                      Categorías disponibles ({categorias.length})
                     </Typography>
                     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                       {categorias.map((cat) => (

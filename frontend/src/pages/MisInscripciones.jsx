@@ -68,7 +68,7 @@ const MisInscripciones = () => {
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
-        Mis Inscripciones
+        Mis inscripciones
       </Typography>
 
       {mensaje && (
@@ -80,10 +80,10 @@ const MisInscripciones = () => {
       {inscripciones.length === 0 ? (
         <Paper elevation={2} sx={{ p: 4, textAlign: "center" }}>
           <Typography variant="h6" color="text.secondary">
-            No tienes inscripciones aún
+            No tenés inscripciones aún
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Ve a la página de Inscripciones para registrarte en un evento
+            Ir a la página de Inscripciones para registrarte en un evento
           </Typography>
         </Paper>
       ) : (

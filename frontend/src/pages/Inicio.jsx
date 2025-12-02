@@ -183,7 +183,7 @@ const Inicio = () => {
               mb: 1
             }}
           >
-            Próximos Eventos
+            Próximos eventos
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             Descubre las mejores competencias deportivas
@@ -306,7 +306,7 @@ const Inicio = () => {
               No hay eventos disponibles en este momento
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              ¡Vuelve pronto para ver nuevas competencias!
+              ¡Volvé pronto para ver nuevas competencias!
             </Typography>
           </Box>
         )}
@@ -324,7 +324,7 @@ const Inicio = () => {
       >
         <Container maxWidth="lg">
           <Typography variant="body1" sx={{ mb: 1 }}>
-            © 2025 GO! SPORTS - Plataforma Integral para el Deporte
+            © 2025 GO! SPORTS - Plataforma integral para el deporte
           </Typography>
           <Typography variant="body2" color="rgba(255,255,255,0.7)">
             Desarrollado con ❤️ para la comunidad deportiva

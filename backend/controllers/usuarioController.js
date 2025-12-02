@@ -1,5 +1,7 @@
 const Usuario = require('../models/usuarioModels');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const usuarioController = {
   obtenerUsuarios: (req, res) => {
@@ -24,25 +26,45 @@ const usuarioController = {
     });
   },
 
-  crearUsuario: (req, res) => {
-    const nuevoUsuario = req.body;
-    Usuario.create(nuevoUsuario, (err, resultado) => {
-      if (err) {
-        return res.status(500).json({ mensaje: 'Error al crear usuario', error: err });
+  crearUsuario: async (req, res) => {
+    try {
+      const nuevoUsuario = req.body;
+      
+      if (nuevoUsuario.contraseña) {
+        const hashedPassword = await bcrypt.hash(nuevoUsuario.contraseña, saltRounds);
+        nuevoUsuario.contraseña = hashedPassword;
       }
-      res.status(201).json({ mensaje: 'Usuario creado correctamente', idInsertado: resultado.insertId });
-    });
+
+      Usuario.create(nuevoUsuario, (err, resultado) => {
+        if (err) {
+          return res.status(500).json({ mensaje: 'Error al crear usuario', error: err });
+        }
+        res.status(201).json({ mensaje: 'Usuario creado correctamente', idInsertado: resultado.insertId });
+      });
+    } catch (error) {
+      res.status(500).json({ mensaje: 'Error al procesar la contraseña', error: error.message });
+    }
   },
 
-  actualizarUsuario: (req, res) => {
-    const id = req.params.id;
-    const datosActualizados = req.body;
-    Usuario.update(id, datosActualizados, (err) => {
-      if (err) {
-        return res.status(500).json({ mensaje: 'Error al actualizar usuario', error: err });
+  actualizarUsuario: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const datosActualizados = req.body;
+
+      if (datosActualizados.contraseña) {
+        const hashedPassword = await bcrypt.hash(datosActualizados.contraseña, saltRounds);
+        datosActualizados.contraseña = hashedPassword;
       }
-      res.status(200).json({ mensaje: 'Usuario actualizado correctamente' });
-    });
+
+      Usuario.update(id, datosActualizados, (err) => {
+        if (err) {
+          return res.status(500).json({ mensaje: 'Error al actualizar usuario', error: err });
+        }
+        res.status(200).json({ mensaje: 'Usuario actualizado correctamente' });
+      });
+    } catch (error) {
+      res.status(500).json({ mensaje: 'Error al procesar la contraseña', error: error.message });
+    }
   },
 
   eliminarUsuario: (req, res) => {
@@ -55,31 +77,44 @@ const usuarioController = {
     });
   },
 
-  login: (req, res) => {
-    const { email, contraseña } = req.body;
-    Usuario.findByEmail(email, (err, resultado) => {
-      if (err) {
-        return res.status(500).json({ mensaje: 'Error al buscar el usuario', error: err });
-      }
-      if (resultado.length === 0 || resultado[0].contraseña !== contraseña) {
-        return res.status(401).json({ mensaje: 'Credenciales inválidas' });
-      }
-
-      const usuario = resultado[0];
-      const token = jwt.sign({ id: usuario.idUsuario, perfil: usuario.rol }, 'secreto', { expiresIn: '4h' });
-
-      res.status(200).json({
-        mensaje: 'Login exitoso',
-        token,
-        usuario: {
-          id: usuario.idUsuario,
-          nombre: usuario.nombre,
-          apellido: usuario.apellido,
-          email: usuario.email,
-          perfil: usuario.rol
+  login: async (req, res) => {
+    try {
+      const { email, contraseña } = req.body;
+      
+      Usuario.findByEmail(email, async (err, resultado) => {
+        if (err) {
+          return res.status(500).json({ mensaje: 'Error al buscar el usuario', error: err });
         }
+        
+        if (resultado.length === 0) {
+          return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        }
+
+        const usuario = resultado[0];
+
+        const match = await bcrypt.compare(contraseña, usuario.contraseña);
+        
+        if (!match) {
+          return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        }
+
+        const token = jwt.sign({ id: usuario.idUsuario, perfil: usuario.rol }, 'secreto', { expiresIn: '4h' });
+
+        res.status(200).json({
+          mensaje: 'Login exitoso',
+          token,
+          usuario: {
+            id: usuario.idUsuario,
+            nombre: usuario.nombre,
+            apellido: usuario.apellido,
+            email: usuario.email,
+            perfil: usuario.rol
+          }
+        });
       });
-    });
+    } catch (error) {
+      res.status(500).json({ mensaje: 'Error al procesar el login', error: error.message });
+    }
   }
 };
 
