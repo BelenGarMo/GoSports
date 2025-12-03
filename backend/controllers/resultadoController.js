@@ -26,7 +26,7 @@ const resultadoController = {
     );
   },
 
-  // Obtener resultados de un evento (CON DATOS DE CATEGORÍA)
+  // Obtener resultados de un evento
   obtenerResultadosPorEvento: (req, res) => {
     const { idEvento } = req.params;
     const sql = `

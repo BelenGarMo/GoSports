@@ -79,7 +79,7 @@ const eventoController = {
       });
     }
 
-    // Primero verificamos quién es el creador del evento
+    // Verificamos quién es el creador del evento
     Evento.obtenerPorId(id, (err, resultado) => {
       if (err) {
         console.error('Error al obtener el evento:', err);
@@ -92,7 +92,7 @@ const eventoController = {
 
       const evento = resultado[0];
 
-      // Verificar permisos: solo el creador o un cronometrista puede actualizar
+      // Solo el creador o un cronometrista puede actualizar
       if (evento.idCreador !== idUsuario && perfil !== 'cronometrista') {
         return res.status(403).json({ 
           mensaje: 'No tienes permisos para modificar este evento'

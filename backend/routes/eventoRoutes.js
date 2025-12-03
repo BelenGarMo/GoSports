@@ -19,5 +19,5 @@ router.put('/:id', eventoController.actualizarEvento);
 // Ruta para eliminar un evento
 router.delete('/:id', eventoController.eliminarEvento);
 
-// Exportamos el router para poder usarlo en el index.js
+// Exportamos el router
 module.exports = router;
