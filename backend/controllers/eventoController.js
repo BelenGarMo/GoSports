@@ -43,12 +43,11 @@ const eventoController = {
   crearEvento: (req, res) => {
     const nuevoEvento = req.body;
     
-    // Validar que venga el idCreador
     if (!nuevoEvento.idCreador) {
       return res.status(400).json({ error: 'El ID del creador es obligatorio' });
     }
 
-    // Validar campos requeridos
+    // Validar campos obligatorios
     if (!nuevoEvento.nombre || !nuevoEvento.fecha || !nuevoEvento.lugar) {
       return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
@@ -69,7 +68,16 @@ const eventoController = {
   actualizarEvento: (req, res) => {
     const { id } = req.params;
     const datosActualizados = req.body;
-    const { idUsuario, perfil } = req.body; // Estos vienen del frontend
+
+    // Obtener idUsuario y perfil del body
+    const idUsuario = req.body.idUsuario;
+    const perfil = req.body.perfil;
+
+    if (!idUsuario || !perfil) {
+      return res.status(400).json({ 
+        error: 'Faltan datos de autenticación (idUsuario y perfil)' 
+      });
+    }
 
     // Primero verificamos quién es el creador del evento
     Evento.obtenerPorId(id, (err, resultado) => {
@@ -87,7 +95,7 @@ const eventoController = {
       // Verificar permisos: solo el creador o un cronometrista puede actualizar
       if (evento.idCreador !== idUsuario && perfil !== 'cronometrista') {
         return res.status(403).json({ 
-          mensaje: 'No tienes permisos para modificar este evento' 
+          mensaje: 'No tienes permisos para modificar este evento'
         });
       }
 
@@ -105,7 +113,13 @@ const eventoController = {
   // Eliminar un evento (solo el creador puede eliminarlo)
   eliminarEvento: (req, res) => {
     const { id } = req.params;
-    const { idUsuario, perfil } = req.body;
+    const { idUsuario } = req.body;
+
+    if (!idUsuario) {
+      return res.status(400).json({ 
+        error: 'Falta dato de autenticación (idUsuario)' 
+      });
+    }
 
     // Verificar quién es el creador
     Evento.obtenerPorId(id, (err, resultado) => {

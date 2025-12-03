@@ -56,9 +56,13 @@ const Header = () => {
   const navItems = [
     { label: 'Inicio', path: '/' },
     { label: 'Calendario', path: '/calendario' },
-    { label: 'Resultados', path: '/resultados' },
-    { label: 'Inscripciones', path: '/inscripciones' }
+    { label: 'Resultados', path: '/resultados' }
   ];
+
+  // Opción "Inscripciones" solo si NO es organizador ni cronometrista
+  if (!usuario || usuario.perfil === 'corredor') {
+    navItems.push({ label: 'Inscripciones', path: '/inscripciones' });
+  }
 
   const MobileMenu = () => (
     <Drawer
@@ -90,6 +94,17 @@ const Header = () => {
           {usuario && (
             <>
               <Divider sx={{ my: 1 }} />
+              {usuario.perfil === "corredor" && (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    to="/mis-inscripciones"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <ListItemText primary="Mis Inscripciones" />
+                  </ListItemButton>
+                </ListItem>
+              )}
               {usuario.perfil === "organizador" && (
                 <ListItem disablePadding>
                   <ListItemButton
@@ -159,7 +174,6 @@ const Header = () => {
         }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between", py: 1 }}>
-          {/* Logo */}
           <Box
             component={Link}
             to="/"
@@ -251,6 +265,21 @@ const Header = () => {
                 </>
               ) : (
                 <>
+                  {usuario.perfil === "corredor" && (
+                    <Button
+                      component={Link}
+                      to="/mis-inscripciones"
+                      sx={{
+                        color: '#667eea',
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: 'rgba(102, 126, 234, 0.1)'
+                        }
+                      }}
+                    >
+                      Mis Inscripciones
+                    </Button>
+                  )}
                   {usuario.perfil === "organizador" && (
                     <Button
                       component={Link}

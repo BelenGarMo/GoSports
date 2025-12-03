@@ -23,7 +23,8 @@ import {
   Select,
   MenuItem,
   Paper,
-  Chip
+  Chip,
+  CircularProgress
 } from "@mui/material";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -31,6 +32,123 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CategoryIcon from "@mui/icons-material/Category";
+
+// Componente para mostrar lista de inscriptos
+const InscriptosList = ({ eventoSeleccionado, token }) => {
+  const [inscriptos, setInscriptos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchInscriptos();
+  }, [eventoSeleccionado]);
+
+  const fetchInscriptos = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await axios.get(
+        `http://localhost:3001/api/inscripciones/evento/${eventoSeleccionado}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setInscriptos(res.data);
+    } catch (err) {
+      console.error("Error al obtener inscriptos:", err);
+      setError("Error al cargar los inscriptos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return <Alert severity="error">{error}</Alert>;
+  }
+
+  if (inscriptos.length === 0) {
+    return (
+      <Alert severity="info">
+        No hay inscriptos para este evento todavía
+      </Alert>
+    );
+  }
+
+  return (
+    <Paper elevation={2}>
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          Total de inscriptos: {inscriptos.length}
+        </Typography>
+      </Box>
+      <Table>
+        <TableHead>
+          <TableRow sx={{ backgroundColor: "primary.main" }}>
+            <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+              Corredor
+            </TableCell>
+            <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+              Email
+            </TableCell>
+            <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+              Categoría
+            </TableCell>
+            <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+              Método de Pago
+            </TableCell>
+            <TableCell sx={{ color: "white", fontWeight: "bold" }}>
+              Estado de Pago
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {inscriptos.map((inscripto) => (
+            <TableRow key={inscripto.idInscripcion} hover>
+              <TableCell>
+                {inscripto.nombre} {inscripto.apellido}
+              </TableCell>
+              <TableCell>{inscripto.email}</TableCell>
+              <TableCell>
+                {inscripto.nombreCategoria ? (
+                  <Chip
+                    label={inscripto.nombreCategoria}
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                  />
+                ) : (
+                  "-"
+                )}
+              </TableCell>
+              <TableCell sx={{ textTransform: "capitalize" }}>
+                {inscripto.metodoPago || "No especificado"}
+              </TableCell>
+              <TableCell>
+                <Chip
+                  label={inscripto.estadoPago}
+                  color={
+                    inscripto.estadoPago === "pagado"
+                      ? "success"
+                      : inscripto.estadoPago === "pendiente"
+                      ? "warning"
+                      : "default"
+                  }
+                  size="small"
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
+  );
+};
 
 const PanelOrganizador = () => {
   const { usuario, token } = useContext(AuthContext);
@@ -113,19 +231,23 @@ const PanelOrganizador = () => {
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
     try {
-      const eventoData = {
-        ...formEvento,
-        idCreador: usuario.id
-      };
-
       if (editandoEvento) {
+        const eventoDataUpdate = {
+          ...formEvento,
+          idUsuario: usuario.id,
+          perfil: usuario.perfil
+        };
         await axios.put(
           `http://localhost:3001/api/eventos/${editandoEvento}`,
-          eventoData,
+          eventoDataUpdate,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMensaje("Evento actualizado con éxito");
       } else {
+        const eventoData = {
+          ...formEvento,
+          idCreador: usuario.id
+        };
         const res = await axios.post(
           "http://localhost:3001/api/eventos",
           eventoData,
@@ -573,9 +695,39 @@ const PanelOrganizador = () => {
 
       {/* TAB 3: INSCRIPTOS */}
       {tabValue === 2 && (
-        <Alert severity="info">
-          Próximamente: Lista de inscriptos al evento seleccionado
-        </Alert>
+        <Box>
+          {eventos.length === 0 ? (
+            <Alert severity="info">
+              Primero debes crear un evento para ver los inscriptos
+            </Alert>
+          ) : (
+            <>
+              <Box sx={{ mb: 3 }}>
+                <FormControl sx={{ minWidth: 300 }}>
+                  <InputLabel>Evento</InputLabel>
+                  <Select
+                    value={eventoSeleccionado || ""}
+                    label="Evento"
+                    onChange={(e) => setEventoSeleccionado(e.target.value)}
+                  >
+                    {eventos.map((ev) => (
+                      <MenuItem key={ev.idEvento} value={ev.idEvento}>
+                        {ev.nombre}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+              {eventoSeleccionado && (
+                <InscriptosList 
+                  eventoSeleccionado={eventoSeleccionado} 
+                  token={token}
+                />
+              )}
+            </>
+          )}
+        </Box>
       )}
 
       {/* DIALOG PARA CREAR/EDITAR CATEGORÍA */}

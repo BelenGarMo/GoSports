@@ -311,7 +311,7 @@ const Resultados = () => {
                 <Card elevation={2}>
                   <CardContent>
                     <Typography color="text.secondary" gutterBottom>
-                      Total Participantes
+                      Total participantes
                     </Typography>
                     <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                       {estadisticas.totalParticipantes}
@@ -323,7 +323,7 @@ const Resultados = () => {
                 <Card elevation={2}>
                   <CardContent>
                     <Typography color="text.secondary" gutterBottom>
-                      Tiempo Promedio
+                      Tiempo promedio
                     </Typography>
                     <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                       {estadisticas.tiempoPromedio}

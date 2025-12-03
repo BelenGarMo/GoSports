@@ -5,7 +5,7 @@ const db = require('./config/db');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-// Middleware para permitir solicitudes desde otros origenes (por ejemplo, desde el frontend)
+// Middleware para permitir solicitudes desde otros origenes
 app.use(cors());
 
 // Middleware para parsear solicitudes con JSON

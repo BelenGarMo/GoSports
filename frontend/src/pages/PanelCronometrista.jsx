@@ -129,7 +129,7 @@ const PanelCronometrista = () => {
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
-        Panel del Cronometrista
+        Panel del cronometrista
       </Typography>
 
       {mensaje && (
@@ -147,7 +147,7 @@ const PanelCronometrista = () => {
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ p: 4 }}>
             <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-              Cargar Tiempo de Corredor
+              Cargar tiempo de corredor
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit}>
@@ -175,7 +175,7 @@ const PanelCronometrista = () => {
 
               {eventoSeleccionado && inscritos.length === 0 && (
                 <Alert severity="warning" sx={{ mb: 3 }}>
-                  No hay corredores inscritos en este evento
+                  No hay corredores inscriptos en este evento
                 </Alert>
               )}
 
@@ -268,7 +268,7 @@ const PanelCronometrista = () => {
                     size="large"
                     fullWidth
                   >
-                    Registrar Tiempo
+                    Registrar tiempo
                   </Button>
                 </>
               )}

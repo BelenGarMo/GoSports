@@ -186,7 +186,7 @@ const Inicio = () => {
             Próximos eventos
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Descubre las mejores competencias deportivas
+            Descubrí las mejores competencias deportivas
           </Typography>
         </Box>
 
@@ -327,7 +327,7 @@ const Inicio = () => {
             © 2025 GO! SPORTS - Plataforma integral para el deporte
           </Typography>
           <Typography variant="body2" color="rgba(255,255,255,0.7)">
-            Desarrollado con ❤️ para la comunidad deportiva
+            Desarrollado con amor para la comunidad deportiva
           </Typography>
         </Container>
       </Box>

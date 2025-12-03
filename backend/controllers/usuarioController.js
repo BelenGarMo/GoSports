@@ -105,6 +105,7 @@ const usuarioController = {
           token,
           usuario: {
             id: usuario.idUsuario,
+            idUsuario: usuario.idUsuario,
             nombre: usuario.nombre,
             apellido: usuario.apellido,
             email: usuario.email,

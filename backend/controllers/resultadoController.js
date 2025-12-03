@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 const resultadoController = {
-  // Crear un resultado (con categoría automática)
+  // Crear un resultado
   crearResultado: (req, res) => {
     const { idEvento, idUsuario, idCategoria, tiempoOficial, posicionGeneral, posicionCategoria } = req.body;
 

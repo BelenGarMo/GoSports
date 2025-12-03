@@ -96,7 +96,7 @@ const Inscripciones = () => {
   const verificarInscripcion = async (idEvento) => {
     try {
       const res = await axios.get(
-        `http://localhost:3001/api/inscripciones/verificar/${idEvento}/${usuario.idUsuario}`,
+        `http://localhost:3001/api/inscripciones/verificar/${idEvento}/${usuario.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setYaInscrito(res.data.inscrito);
@@ -376,7 +376,7 @@ const Inscripciones = () => {
             <Card elevation={3}>
               <CardContent>
                 <Typography variant="body1" color="text.secondary" align="center">
-                  Selecciona un evento para ver más información
+                  Seleccioná un evento para ver más información
                 </Typography>
               </CardContent>
             </Card>

@@ -55,7 +55,7 @@ const Login = () => {
             required
           />
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-            Iniciar Sesión
+            Iniciar sesión
           </Button>
         </form>
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
